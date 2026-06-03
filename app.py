@@ -517,9 +517,15 @@ st.markdown(
 """
 <div class="footer">
 
-Made By Adnan Amin Mir , Obaid rashid ,Nafeesa jan 
-<br>
-Smart Waste Management System ♻️
+👨‍💻 Developed By  
+
+<h2>
+<b>
+Adnan Amin Mir <br>
+Obaid Rashid <br>
+Nafeesa Jan
+</b>
+</h2>
 
 </div>
 
