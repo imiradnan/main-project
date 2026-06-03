@@ -517,7 +517,7 @@ st.markdown(
 """
 <div class="footer">
 
-Made with ❤️ using TensorFlow + Streamlit  
+Made By Adnan Amin Mir , Obaid rashid ,Nafeesa jan 
 <br>
 Smart Waste Management System ♻️
 
