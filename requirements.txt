@@ -1,6 +1,5 @@
 streamlit
 tensorflow
-keras
 numpy
 pillow
-h5py
+streamlit-option-menu
