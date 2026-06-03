@@ -228,7 +228,7 @@ if menu=="🏠 Home":
 
     b.metric(
         "Model",
-        "MobileNetV2"
+        "AI Vision Engine"
     )
 
 
