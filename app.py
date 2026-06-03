@@ -519,13 +519,13 @@ st.markdown(
 
 👨‍💻 Developed By  
 
-<h2>
+<h4>
 <b>
 Adnan Amin Mir <br>
 Obaid Rashid <br>
 Nafeesa Jan
 </b>
-</h2>
+</h4>
 
 </div>
 
