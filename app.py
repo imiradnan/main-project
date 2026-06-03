@@ -17,18 +17,13 @@ st.set_page_config(
 )
 
 
-
 # -------------------------
-# Custom CSS
+# CSS Design
 # -------------------------
 
 st.markdown(
 """
 <style>
-
-.main {
-    background-color:#f5f7fa;
-}
 
 .title-box {
     background:linear-gradient(90deg,#00b09b,#96c93d);
@@ -42,11 +37,7 @@ st.markdown(
     background:white;
     padding:25px;
     border-radius:15px;
-    box-shadow:0px 5px 20px rgba(0,0,0,0.2);
-    text-align:center;
-}
-
-.login-box {
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
     text-align:center;
 }
 
@@ -61,9 +52,8 @@ unsafe_allow_html=True
 )
 
 
-
 # -------------------------
-# LOGIN SYSTEM
+# Login System
 # -------------------------
 
 if "login" not in st.session_state:
@@ -72,10 +62,7 @@ if "login" not in st.session_state:
 
 def login_page():
 
-    st.markdown(
-        "<h1 style='text-align:center;'>🔐 Smart Waste Login</h1>",
-        unsafe_allow_html=True
-    )
+    st.title("🔐 Smart Waste Login")
 
 
     username = st.text_input(
@@ -89,9 +76,7 @@ def login_page():
     )
 
 
-    if st.button(
-        "🚀 Login"
-    ):
+    if st.button("🚀 Login"):
 
         if username == "adnan" and password == "123@456":
 
@@ -103,11 +88,10 @@ def login_page():
 
             st.rerun()
 
-
         else:
 
             st.error(
-                "Wrong Username or Password ❌"
+                "Invalid Login ❌"
             )
 
 
@@ -120,51 +104,46 @@ if st.session_state.login == False:
 
 
 
-
-
 # -------------------------
-# Load AI Model
+# Load Model
 # -------------------------
 
 @st.cache_resource
-def load_ai_model():
+def load_model():
 
     return tf.keras.models.load_model(
         "smart_waste_model.h5"
     )
 
 
-model = load_ai_model()
-
-
+model = load_model()
 
 
 
 # -------------------------
-# Classes
+# Data
 # -------------------------
 
 classes = [
 
-    "cardboard",
-    "glass",
-    "metal",
-    "paper",
-    "plastic",
-    "trash"
+"cardboard",
+"glass",
+"metal",
+"paper",
+"plastic",
+"trash"
 
 ]
 
 
-
 icons = {
 
-    "cardboard":"📦",
-    "glass":"🍾",
-    "metal":"🔩",
-    "paper":"📄",
-    "plastic":"🥤",
-    "trash":"🗑️"
+"cardboard":"📦",
+"glass":"🍾",
+"metal":"🔩",
+"paper":"📄",
+"plastic":"🥤",
+"trash":"🗑️"
 
 }
 
@@ -172,27 +151,25 @@ icons = {
 
 tips = {
 
-"plastic":
-"🥤 Avoid single-use plastics. Recycle plastic bottles properly.",
-
-"paper":
-"📄 Reuse paper and recycle newspapers.",
+"cardboard":
+"📦 Recycle cardboard boxes properly.",
 
 "glass":
-"🍾 Glass can be recycled multiple times.",
+"🍾 Glass can be reused and recycled.",
 
 "metal":
-"🔩 Recycle cans and metal objects.",
+"🔩 Send metals for recycling.",
 
-"cardboard":
-"📦 Flatten boxes before recycling.",
+"paper":
+"📄 Save trees by recycling paper.",
+
+"plastic":
+"🥤 Reduce plastic usage.",
 
 "trash":
-"🗑 Dispose safely in proper waste bins."
+"🗑 Dispose waste correctly."
 
 }
-
-
 
 
 
@@ -206,18 +183,15 @@ st.markdown(
 
 <h1>♻️ Smart Waste Classification System</h1>
 
-<h4>AI Powered Waste Detection using Deep Learning</h4>
+<h4>AI Powered Waste Detection</h4>
 
 </div>
-
 """,
 unsafe_allow_html=True
 )
 
 
-
 st.write("")
-
 
 
 
@@ -234,21 +208,12 @@ with st.sidebar:
 
 
     st.success(
-        "Logged in as Admin"
-    )
-
-
-    st.write(
-    """
-    AI system that detects waste category
-    and helps in recycling.
-    """
+        "Admin Logged In"
     )
 
 
     st.info(
     """
-
     Categories:
 
     📦 Cardboard
@@ -262,21 +227,17 @@ with st.sidebar:
     🥤 Plastic
 
     🗑 Trash
-
     """
     )
-
 
 
     if st.button(
         "🚪 Logout"
     ):
 
-        st.session_state.login = False
+        st.session_state.login=False
 
         st.rerun()
-
-
 
 
 
@@ -284,10 +245,7 @@ with st.sidebar:
 # Main Section
 # -------------------------
 
-col1, col2 = st.columns(
-    2
-)
-
+col1,col2 = st.columns(2)
 
 
 uploaded_file = None
@@ -315,22 +273,50 @@ with col1:
     )
 
 
-
-    st.subheader(
-        "OR"
-    )
-
-
-    camera_image = st.camera_input(
-        "📸 Capture Image"
-    )
+    st.subheader("OR")
 
 
 
-    if camera_image:
+    # CAMERA BUTTON FEATURE
 
-        uploaded_file = camera_image
 
+    if "camera_open" not in st.session_state:
+
+        st.session_state.camera_open=False
+
+
+
+    if st.button(
+        "📸 Open Camera"
+    ):
+
+        st.session_state.camera_open=True
+
+
+
+    if st.session_state.camera_open:
+
+
+        camera_image = st.camera_input(
+
+            "Capture Waste Image"
+
+        )
+
+
+        if camera_image:
+
+            uploaded_file=camera_image
+
+
+
+        if st.button(
+            "❌ Close Camera"
+        ):
+
+            st.session_state.camera_open=False
+
+            st.rerun()
 
 
 
@@ -345,9 +331,7 @@ if uploaded_file is not None:
 
     img = Image.open(
         uploaded_file
-    ).convert(
-        "RGB"
-    )
+    ).convert("RGB")
 
 
 
@@ -365,56 +349,49 @@ if uploaded_file is not None:
 
 
 
-    img_resize = img.resize(
+    img = img.resize(
         (224,224)
     )
 
 
-    img_array = image.img_to_array(
-        img_resize
-    )
+    img_array=image.img_to_array(img)
 
 
-    img_array = np.expand_dims(
+    img_array=np.expand_dims(
         img_array,
         axis=0
     )
 
 
-    img_array = img_array / 255.0
-
+    img_array=img_array/255.0
 
 
 
     with st.spinner(
-        "🤖 AI is analyzing..."
+        "🤖 AI Analyzing Image..."
     ):
+
 
         time.sleep(1)
 
 
-        prediction = model.predict(
+        prediction=model.predict(
             img_array
         )
 
 
 
-
-
-    index = np.argmax(
+    index=np.argmax(
         prediction
     )
 
 
-    result = classes[
-        index
-    ]
+    result=classes[index]
 
 
-    confidence = np.max(
+    confidence=np.max(
         prediction
-    ) * 100
-
+    )*100
 
 
 
@@ -423,11 +400,9 @@ if uploaded_file is not None:
     with col2:
 
 
-
         st.subheader(
-            "🤖 AI Result"
+            "🤖 Result"
         )
-
 
 
         st.markdown(
@@ -439,17 +414,13 @@ if uploaded_file is not None:
 
         <h2>{result.upper()}</h2>
 
-        <h3>Confidence</h3>
-
-        <h2>{confidence:.2f}%</h2>
+        <h3>{confidence:.2f}%</h3>
 
         </div>
 
         """,
         unsafe_allow_html=True
-
         )
-
 
 
         st.progress(
@@ -458,30 +429,25 @@ if uploaded_file is not None:
 
 
 
-        if confidence > 80:
+        if confidence>80:
 
             st.success(
-                "High Confidence Prediction ✅"
+                "High Confidence ✅"
             )
 
-
-        elif confidence > 50:
+        elif confidence>50:
 
             st.warning(
-                "Medium Confidence Prediction ⚠️"
+                "Medium Confidence ⚠️"
             )
-
 
         else:
 
             st.error(
-                "Low Confidence Prediction ❌"
+                "Low Confidence ❌"
             )
 
 
-
-
-        # Recycling Tip
 
         st.info(
             tips[result]
@@ -489,18 +455,14 @@ if uploaded_file is not None:
 
 
 
+        report=f"""
+
+SMART WASTE REPORT
 
 
-        # Report
+Waste Type:
 
-        report = f"""
-
-SMART WASTE MANAGEMENT REPORT
-
-
-Waste Category:
-
-{result.upper()}
+{result}
 
 
 Confidence:
@@ -508,13 +470,11 @@ Confidence:
 {confidence:.2f}%
 
 
-Recycling Suggestion:
+Suggestion:
 
 {tips[result]}
 
-
-        """
-
+"""
 
 
         st.download_button(
@@ -529,7 +489,6 @@ Recycling Suggestion:
 
 
 
-
         if st.button(
             "🔄 Analyze New Image"
         ):
@@ -538,18 +497,12 @@ Recycling Suggestion:
 
 
 
-
-
-
 else:
 
 
     st.info(
-        "Upload or capture image to start classification"
+        "Upload image or open camera to start"
     )
-
-
-
 
 
 
