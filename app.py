@@ -11,10 +11,11 @@ import time
 # -------------------------
 
 st.set_page_config(
-    page_title="Smart Waste segration",
+    page_title="Smart Waste Segregation",
     page_icon="♻️",
     layout="wide"
 )
+
 
 
 # -------------------------
@@ -26,11 +27,11 @@ st.markdown(
 <style>
 
 .main {
-    background-color: #f5f7fa;
+    background-color:#f5f7fa;
 }
 
 .title-box {
-    background: linear-gradient(90deg,#00b09b,#96c93d);
+    background:linear-gradient(90deg,#00b09b,#96c93d);
     padding:25px;
     border-radius:15px;
     text-align:center;
@@ -41,7 +42,11 @@ st.markdown(
     background:white;
     padding:25px;
     border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    box-shadow:0px 5px 20px rgba(0,0,0,0.2);
+    text-align:center;
+}
+
+.login-box {
     text-align:center;
 }
 
@@ -56,12 +61,74 @@ unsafe_allow_html=True
 )
 
 
+
 # -------------------------
-# Load Model
+# LOGIN SYSTEM
+# -------------------------
+
+if "login" not in st.session_state:
+    st.session_state.login = False
+
+
+def login_page():
+
+    st.markdown(
+        "<h1 style='text-align:center;'>🔐 Smart Waste Login</h1>",
+        unsafe_allow_html=True
+    )
+
+
+    username = st.text_input(
+        "Username"
+    )
+
+
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+
+    if st.button(
+        "🚀 Login"
+    ):
+
+        if username == "adnan" and password == "123@456":
+
+            st.session_state.login = True
+
+            st.success(
+                "Login Successful ✅"
+            )
+
+            st.rerun()
+
+
+        else:
+
+            st.error(
+                "Wrong Username or Password ❌"
+            )
+
+
+
+if st.session_state.login == False:
+
+    login_page()
+
+    st.stop()
+
+
+
+
+
+# -------------------------
+# Load AI Model
 # -------------------------
 
 @st.cache_resource
 def load_ai_model():
+
     return tf.keras.models.load_model(
         "smart_waste_model.h5"
     )
@@ -71,28 +138,61 @@ model = load_ai_model()
 
 
 
+
+
 # -------------------------
 # Classes
 # -------------------------
 
 classes = [
+
     "cardboard",
     "glass",
     "metal",
     "paper",
     "plastic",
     "trash"
+
 ]
 
 
+
 icons = {
+
     "cardboard":"📦",
     "glass":"🍾",
     "metal":"🔩",
     "paper":"📄",
     "plastic":"🥤",
     "trash":"🗑️"
+
 }
+
+
+
+tips = {
+
+"plastic":
+"🥤 Avoid single-use plastics. Recycle plastic bottles properly.",
+
+"paper":
+"📄 Reuse paper and recycle newspapers.",
+
+"glass":
+"🍾 Glass can be recycled multiple times.",
+
+"metal":
+"🔩 Recycle cans and metal objects.",
+
+"cardboard":
+"📦 Flatten boxes before recycling.",
+
+"trash":
+"🗑 Dispose safely in proper waste bins."
+
+}
+
+
 
 
 
@@ -115,7 +215,9 @@ unsafe_allow_html=True
 )
 
 
+
 st.write("")
+
 
 
 
@@ -125,38 +227,61 @@ st.write("")
 
 with st.sidebar:
 
-    st.title("🌱 About Project")
+
+    st.title(
+        "🌱 Dashboard"
+    )
+
+
+    st.success(
+        "Logged in as Admin"
+    )
+
 
     st.write(
     """
-    This system uses Artificial Intelligence 
-    to classify waste images into different 
-    recycling categories.
-    """)
+    AI system that detects waste category
+    and helps in recycling.
+    """
+    )
 
 
     st.info(
     """
+
     Categories:
 
-    📦 Cardboard  
-    🍾 Glass  
-    🔩 Metal  
-    📄 Paper  
-    🥤 Plastic  
+    📦 Cardboard
+
+    🍾 Glass
+
+    🔩 Metal
+
+    📄 Paper
+
+    🥤 Plastic
+
     🗑 Trash
+
     """
     )
 
 
-    st.write(
-        "Developed using TensorFlow + Streamlit"
-    )
+
+    if st.button(
+        "🚪 Logout"
+    ):
+
+        st.session_state.login = False
+
+        st.rerun()
+
+
 
 
 
 # -------------------------
-# Main Layout
+# Main Section
 # -------------------------
 
 col1, col2 = st.columns(
@@ -165,7 +290,12 @@ col1, col2 = st.columns(
 
 
 
+uploaded_file = None
+
+
+
 with col1:
+
 
     st.subheader(
         "📤 Upload Waste Image"
@@ -173,17 +303,44 @@ with col1:
 
 
     uploaded_file = st.file_uploader(
-        "Choose an image",
+
+        "Choose Image",
+
         type=[
             "jpg",
             "jpeg",
             "png"
         ]
+
     )
 
 
 
+    st.subheader(
+        "OR"
+    )
+
+
+    camera_image = st.camera_input(
+        "📸 Capture Image"
+    )
+
+
+
+    if camera_image:
+
+        uploaded_file = camera_image
+
+
+
+
+
+# -------------------------
+# Prediction
+# -------------------------
+
 if uploaded_file is not None:
+
 
 
     img = Image.open(
@@ -193,19 +350,19 @@ if uploaded_file is not None:
     )
 
 
+
     with col1:
 
         st.image(
+
             img,
-            caption="Uploaded Image",
+
+            caption="Selected Image",
+
             use_container_width=True
+
         )
 
-
-
-    # -------------------------
-    # Preprocessing
-    # -------------------------
 
 
     img_resize = img.resize(
@@ -228,15 +385,19 @@ if uploaded_file is not None:
 
 
 
+
     with st.spinner(
-        "AI is analyzing image..."
+        "🤖 AI is analyzing..."
     ):
 
         time.sleep(1)
 
+
         prediction = model.predict(
             img_array
         )
+
+
 
 
 
@@ -256,17 +417,17 @@ if uploaded_file is not None:
 
 
 
-    # -------------------------
-    # Result
-    # -------------------------
+
 
 
     with col2:
 
 
+
         st.subheader(
             "🤖 AI Result"
         )
+
 
 
         st.markdown(
@@ -282,12 +443,13 @@ if uploaded_file is not None:
 
         <h2>{confidence:.2f}%</h2>
 
-
         </div>
 
         """,
         unsafe_allow_html=True
+
         )
+
 
 
         st.progress(
@@ -295,31 +457,99 @@ if uploaded_file is not None:
         )
 
 
+
         if confidence > 80:
 
             st.success(
-                "High confidence prediction ✅"
+                "High Confidence Prediction ✅"
             )
+
 
         elif confidence > 50:
 
             st.warning(
-                "Medium confidence prediction ⚠️"
+                "Medium Confidence Prediction ⚠️"
             )
+
 
         else:
 
             st.error(
-                "Low confidence prediction ❌"
+                "Low Confidence Prediction ❌"
             )
+
+
+
+
+        # Recycling Tip
+
+        st.info(
+            tips[result]
+        )
+
+
+
+
+
+        # Report
+
+        report = f"""
+
+SMART WASTE MANAGEMENT REPORT
+
+
+Waste Category:
+
+{result.upper()}
+
+
+Confidence:
+
+{confidence:.2f}%
+
+
+Recycling Suggestion:
+
+{tips[result]}
+
+
+        """
+
+
+
+        st.download_button(
+
+            "📥 Download Report",
+
+            report,
+
+            file_name="waste_report.txt"
+
+        )
+
+
+
+
+        if st.button(
+            "🔄 Analyze New Image"
+        ):
+
+            st.rerun()
+
+
+
 
 
 
 else:
 
+
     st.info(
-        "Upload an image to start classification"
+        "Upload or capture image to start classification"
     )
+
+
+
 
 
 
@@ -329,11 +559,14 @@ else:
 
 st.write("---")
 
+
 st.markdown(
 """
 <div class="footer">
 
-Made with ❤️ using Deep Learning | Smart Waste Management System
+Made with ❤️ using TensorFlow + Streamlit  
+<br>
+Smart Waste Management System ♻️
 
 </div>
 
