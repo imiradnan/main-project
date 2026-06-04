@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 import time
 import sqlite3
-
 from PIL import Image
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
@@ -27,7 +26,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
 .title{
 background:linear-gradient(90deg,#00b09b,#96c93d);
 padding:30px;
@@ -35,7 +33,6 @@ border-radius:20px;
 text-align:center;
 color:white;
 }
-
 .card{
 background:white;
 padding:25px;
@@ -43,27 +40,24 @@ border-radius:20px;
 box-shadow:0px 5px 20px rgba(0,0,0,0.2);
 text-align:center;
 }
-
 .footer{
 text-align:center;
 color:gray;
 }
-
 </style>
-""", unsafe_allow_html=True)
-
+""",unsafe_allow_html=True)
 
 
 # ==============================
 # DATABASE
 # ==============================
 
-conn = sqlite3.connect(
+conn=sqlite3.connect(
     "users.db",
     check_same_thread=False
 )
 
-cursor = conn.cursor()
+cursor=conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users(
@@ -76,9 +70,8 @@ password TEXT
 conn.commit()
 
 
-
 # ==============================
-# LOGIN SYSTEM
+# LOGIN
 # ==============================
 
 if "login" not in st.session_state:
@@ -90,9 +83,7 @@ if "current_user" not in st.session_state:
 
 if not st.session_state.login:
 
-
     st.title("♻️ Smart Waste AI")
-
 
     choice=st.radio(
         "Choose Option",
@@ -101,63 +92,45 @@ if not st.session_state.login:
     )
 
 
-
     if choice=="📝 Sign Up":
 
-
-        st.subheader(
-            "Create Account"
-        )
-
+        st.subheader("Create Account")
 
         name=st.text_input(
             "Full Name",
-            key="name"
+            key="signup_name"
         )
-
 
         username=st.text_input(
             "Username",
-            key="signup_username"
+            key="signup_user"
         )
-
 
         password=st.text_input(
             "Password",
             type="password",
-            key="signup_password"
+            key="signup_pass"
         )
 
 
-        if st.button(
-            "Create Account"
-        ):
-
+        if st.button("Create Account"):
 
             try:
 
                 cursor.execute(
                     "INSERT INTO users VALUES (?,?,?)",
-                    (
-                    username,
-                    name,
-                    password
-                    )
+                    (username,name,password)
                 )
 
-
                 conn.commit()
-
 
                 st.success(
                     "Account Created Successfully 🎉"
                 )
 
-
                 st.info(
-                    "Now click Login"
+                    "Click Login"
                 )
-
 
             except:
 
@@ -169,57 +142,39 @@ if not st.session_state.login:
 
     if choice=="🔐 Login":
 
-
-        st.subheader(
-            "Login"
-        )
-
+        st.subheader("Login")
 
         username=st.text_input(
             "Username",
-            key="login_username"
+            key="login_user"
         )
-
 
         password=st.text_input(
             "Password",
             type="password",
-            key="login_password"
+            key="login_pass"
         )
 
 
-        if st.button(
-            "🚀 Login"
-        ):
-
+        if st.button("🚀 Login"):
 
             cursor.execute(
             """
-            SELECT *
-            FROM users
+            SELECT * FROM users
             WHERE username=? AND password=?
             """,
-            (
-            username,
-            password
+            (username,password)
             )
-            )
-
 
             user=cursor.fetchone()
 
-
             if user:
-
 
                 st.session_state.login=True
 
-
                 st.session_state.current_user=username
 
-
                 st.rerun()
-
 
             else:
 
@@ -231,11 +186,9 @@ if not st.session_state.login:
     st.stop()
 
 
-
 # ==============================
 # MODEL
 # ==============================
-
 
 @st.cache_resource
 def load_ai_model():
@@ -246,7 +199,6 @@ def load_ai_model():
 
 
 model=load_ai_model()
-
 
 
 classes=[
@@ -271,27 +223,22 @@ icons={
 
 tips={
 "cardboard":"Recycle cardboard properly 📦",
-"glass":"Recycle glass items 🍾",
-"metal":"Recycle metal waste 🔩",
-"paper":"Recycle paper and save trees 📄",
+"glass":"Recycle glass properly 🍾",
+"metal":"Recycle metals 🔩",
+"paper":"Save trees by recycling 📄",
 "plastic":"Avoid single-use plastic 🥤",
-"trash":"Dispose waste safely 🗑️"
+"trash":"Dispose safely 🗑️"
 }
-
 
 
 # ==============================
 # SIDEBAR
 # ==============================
 
-
 with st.sidebar:
 
-
     menu=option_menu(
-
         "♻️ Smart Waste AI",
-
         [
         "🏠 Home",
         "🤖 Classify Waste",
@@ -299,50 +246,34 @@ with st.sidebar:
         "🌱 Recycling Guide",
         "ℹ️ About"
         ]
-
     )
-
 
     st.success(
         f"👤 Welcome {st.session_state.current_user}"
     )
 
-
-    if st.button(
-        "🚪 Logout"
-    ):
-
+    if st.button("🚪 Logout"):
 
         st.session_state.login=False
 
-
         st.rerun()
-
 
 
 # ==============================
 # HOME
 # ==============================
 
-
 if menu=="🏠 Home":
-
 
     st.markdown("""
 <div class='title'>
-
 <h1>♻️ Smart Waste Classification System</h1>
-
 <h3>AI Powered Waste Segregation</h3>
-
 </div>
 """,
 unsafe_allow_html=True)
 
-
     st.info("""
-Supported Categories:
-
 📦 Cardboard
 
 🍾 Glass
@@ -357,14 +288,11 @@ Supported Categories:
 """)
 
 
-
 # ==============================
 # CLASSIFY
 # ==============================
 
-
 elif menu=="🤖 Classify Waste":
-
 
     st.title(
         "🤖 AI Waste Detection"
@@ -372,7 +300,7 @@ elif menu=="🤖 Classify Waste":
 
 
     uploaded=st.file_uploader(
-        "Upload Waste Image",
+        "Upload Image",
         type=["jpg","jpeg","png"]
     )
 
@@ -381,20 +309,33 @@ elif menu=="🤖 Classify Waste":
         st.session_state.camera=False
 
 
-    if st.button(
-        "📸 Open Camera"
-    ):
+    col1,col2=st.columns(2)
 
-        st.session_state.camera=True
+
+    with col1:
+
+        if st.button("📸 Open Camera"):
+
+            st.session_state.camera=True
+
+            st.rerun()
+
+
+    with col2:
+
+        if st.button("❌ Close Camera"):
+
+            st.session_state.camera=False
+
+            st.rerun()
+
 
 
     if st.session_state.camera:
 
-
         cam=st.camera_input(
             "Capture Image"
         )
-
 
         if cam:
 
@@ -404,50 +345,34 @@ elif menu=="🤖 Classify Waste":
 
     if uploaded:
 
-
-        img=Image.open(
-            uploaded
-        ).convert("RGB")
-
+        img=Image.open(uploaded).convert("RGB")
 
         st.image(
             img,
             width=350
         )
 
-
         img=img.resize(
             (224,224)
         )
 
-
-        arr=image.img_to_array(
-            img
-        )
-
+        arr=image.img_to_array(img)
 
         arr=np.expand_dims(
             arr,
             axis=0
         )
 
-
-        arr=preprocess_input(
-            arr
-        )
+        arr=preprocess_input(arr)
 
 
         with st.spinner(
             "AI Checking..."
         ):
 
-
             time.sleep(1)
 
-
-            pred=model.predict(
-                arr
-            )
+            pred=model.predict(arr)
 
 
         result=classes[
@@ -460,123 +385,91 @@ elif menu=="🤖 Classify Waste":
         )*100
 
 
-
         st.markdown(
         f"""
 <div class='card'>
-
 <h1>{icons[result]}</h1>
-
 <h2>{result.upper()}</h2>
-
 <h3>{confidence:.2f}%</h3>
-
 </div>
 """,
-unsafe_allow_html=True)
+unsafe_allow_html=True
+        )
 
 
         st.progress(
             int(confidence)
         )
 
-
         st.success(
             tips[result]
         )
-
 
 
 # ==============================
 # DASHBOARD
 # ==============================
 
-
 elif menu=="📊 Dashboard":
 
-
-    st.title(
-        "📊 Dashboard"
-    )
-
+    st.title("📊 Dashboard")
 
     st.metric(
         "AI Accuracy",
         "95%"
     )
 
-
     st.metric(
-        "Waste Categories",
+        "Categories",
         "6"
     )
 
 
-
 # ==============================
-# RECYCLING GUIDE
+# GUIDE
 # ==============================
-
 
 elif menu=="🌱 Recycling Guide":
 
-
     st.title(
-        "🌱 Complete Recycling Guide"
+        "🌱 Recycling Guide"
     )
-
 
     st.info("""
 📦 Cardboard:
 ✔ Flatten boxes
-✔ Keep dry
-✔ Remove plastic tape
-
+✔ Keep clean and dry
 
 🍾 Glass:
-✔ Clean before recycling
-✔ Separate broken glass safely
-
+✔ Wash before recycling
+✔ Handle broken glass safely
 
 🔩 Metal:
+✔ Separate metal items
 ✔ Recycle cans
-✔ Separate metals
-
 
 📄 Paper:
 ✔ Reuse paper
 ✔ Save trees
 
-
 🥤 Plastic:
-✔ Avoid single-use plastic
+✔ Avoid single use plastic
 ✔ Use reusable bags
 
-
-🌍 General Tips:
-
+🌍 Important:
 ✔ Separate wet and dry waste
-
-✔ Reduce waste production
-
-✔ Reuse products
-
-✔ Keep surroundings clean
+✔ Reduce pollution
+✔ Keep environment clean
 """)
-
 
 
 # ==============================
 # ABOUT
 # ==============================
 
-
 elif menu=="ℹ️ About":
 
-
-    st.title(
-        "ℹ️ About Project"
-    )
+    st.title("ℹ️ About Project")
 
 
     st.success("""
@@ -607,20 +500,15 @@ Time:
 """)
 
 
-
 # ==============================
 # FOOTER
 # ==============================
 
-
 st.write("---")
-
 
 st.markdown("""
 <div class='footer'>
-
 <h4>♻️ Smart Waste AI System</h4>
-
 </div>
 """,
 unsafe_allow_html=True)
