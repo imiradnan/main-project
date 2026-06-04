@@ -55,46 +55,102 @@ unsafe_allow_html=True
 )
 
 
+# ==============================
+# LOGIN + SIGN UP
+# ==============================
 
-# ==============================
-# LOGIN SYSTEM
-# ==============================
+if "users" not in st.session_state:
+    st.session_state.users={}
 
 if "login" not in st.session_state:
     st.session_state.login=False
 
+if "current_user" not in st.session_state:
+    st.session_state.current_user=""
+
 
 if st.session_state.login==False:
 
-    st.title("🔐 Smart Waste Login")
+    st.title("♻️ Smart Waste AI")
 
-    username=st.text_input("Username")
-
-    password=st.text_input(
-        "Password",
-        type="password"
+    option=st.radio(
+        "Choose Option",
+        ["🔐 Login","📝 Sign Up"],
+        horizontal=True
     )
 
-    if st.button("🚀 Login"):
 
-        if username=="adnan" and password=="123@456":
+    if option=="📝 Sign Up":
 
-            st.session_state.login=True
+        st.subheader("Create Account")
 
-            st.success("Login Successful")
+        name=st.text_input("Full Name")
 
-            st.rerun()
+        username=st.text_input("Username")
 
-        else:
+        password=st.text_input(
+            "Password",
+            type="password"
+        )
 
-            st.error("Invalid Login")
+
+        if st.button("Create Account"):
+
+            if username in st.session_state.users:
+
+                st.error("Username already exists")
+
+            else:
+
+                st.session_state.users[username]={
+                    "name":name,
+                    "password":password
+                }
+
+                st.success(
+                    "Account Created Successfully 🎉"
+                )
+
+
+    if option=="🔐 Login":
+
+        st.subheader("Login")
+
+        username=st.text_input("Username")
+
+        password=st.text_input(
+            "Password",
+            type="password"
+        )
+
+
+        if st.button("🚀 Login"):
+
+            if username in st.session_state.users:
+
+                if password==st.session_state.users[username]["password"]:
+
+                    st.session_state.login=True
+
+                    st.session_state.current_user=username
+
+                    st.rerun()
+
+                else:
+
+                    st.error("Wrong Password")
+
+            else:
+
+                st.error("Account Not Found")
+
 
     st.stop()
 
 
 
 # ==============================
-# MODEL LOAD
+# LOAD MODEL
 # ==============================
 
 @st.cache_resource
@@ -109,47 +165,33 @@ model=load_ai_model()
 
 
 
-# ==============================
-# CLASSES
-# ==============================
-
 classes=[
-    "cardboard",
-    "glass",
-    "metal",
-    "paper",
-    "plastic",
-    "trash"
+"cardboard",
+"glass",
+"metal",
+"paper",
+"plastic",
+"trash"
 ]
 
 
 icons={
-
 "cardboard":"📦",
 "glass":"🍾",
 "metal":"🔩",
 "paper":"📄",
 "plastic":"🥤",
 "trash":"🗑️"
-
 }
 
 
-
 tips={
-
-"cardboard":"Recycle cardboard boxes properly 📦",
-
-"glass":"Reuse and recycle glass items 🍾",
-
-"metal":"Send metals for recycling 🔩",
-
+"cardboard":"Recycle cardboard properly 📦",
+"glass":"Reuse glass items 🍾",
+"metal":"Recycle metal waste 🔩",
 "paper":"Recycle paper and save trees 📄",
-
-"plastic":"Avoid single-use plastic 🥤",
-
-"trash":"Dispose waste safely 🗑️"
-
+"plastic":"Avoid single use plastic 🥤",
+"trash":"Dispose safely 🗑️"
 }
 
 
@@ -157,7 +199,6 @@ tips={
 # ==============================
 # SIDEBAR
 # ==============================
-
 
 with st.sidebar:
 
@@ -172,13 +213,19 @@ with st.sidebar:
         "📊 Dashboard",
         "🌱 Recycling Guide",
         "ℹ️ About"
-        ],
+        ]
 
-        default_index=0
     )
 
 
-    st.success("🟢 System Online")
+    st.success(
+        f"👤 Welcome {st.session_state.current_user}"
+    )
+
+
+    st.success(
+        "🟢 System Online"
+    )
 
 
     if st.button("🚪 Logout"):
@@ -189,18 +236,15 @@ with st.sidebar:
 
 
 
-
 # ==============================
-# HOME PAGE
+# HOME
 # ==============================
-
 
 if menu=="🏠 Home":
 
 
     st.markdown(
     """
-
     <div class='title'>
 
     <h1>♻️ Smart Waste Classification System</h1>
@@ -208,86 +252,47 @@ if menu=="🏠 Home":
     <h3>AI Powered Waste Segregation</h3>
 
     </div>
-
     """,
     unsafe_allow_html=True
     )
 
 
-    st.write("")
-
-
-    a,b,c=st.columns(3)
-
-
-    a.metric(
-        "Categories",
-        "6"
-    )
-
-
-    b.metric(
-        "Model",
-        "AI Vision Engine"
-    )
-
-
-    c.metric(
-        "Status",
-        "Active ✅"
-    )
-
-
     st.info(
     """
-
-    This AI system detects waste type from images
-    and gives recycling suggestions.
-
-    Supported:
+    Supported Waste:
 
     📦 Cardboard  
     🍾 Glass  
     🔩 Metal  
     📄 Paper  
     🥤 Plastic  
-    🗑 Trash  
-
+    🗑 Trash
     """
     )
 
 
 
-
-
 # ==============================
-# CLASSIFICATION PAGE
+# CLASSIFY
 # ==============================
-
 
 elif menu=="🤖 Classify Waste":
 
 
-    st.title(
-        "🤖 AI Waste Detection"
-    )
+    st.title("🤖 AI Waste Detection")
 
 
     uploaded_file=st.file_uploader(
 
         "Upload Waste Image",
 
-        type=[
-            "jpg",
-            "jpeg",
-            "png"
-        ]
+        type=["jpg","jpeg","png"]
 
     )
 
 
     camera=st.camera_input(
-        "Or Capture Image"
+        "Capture Image"
     )
 
 
@@ -296,13 +301,10 @@ elif menu=="🤖 Classify Waste":
         uploaded_file=camera
 
 
-
     if uploaded_file:
 
 
-        img=Image.open(
-            uploaded_file
-        ).convert("RGB")
+        img=Image.open(uploaded_file).convert("RGB")
 
 
         st.image(
@@ -311,14 +313,10 @@ elif menu=="🤖 Classify Waste":
         )
 
 
-        img=img.resize(
-            (224,224)
-        )
+        img=img.resize((224,224))
 
 
-        img_array=image.img_to_array(
-            img
-        )
+        img_array=image.img_to_array(img)
 
 
         img_array=np.expand_dims(
@@ -332,10 +330,7 @@ elif menu=="🤖 Classify Waste":
         )
 
 
-
-        with st.spinner(
-            "AI Analyzing..."
-        ):
+        with st.spinner("AI Checking..."):
 
 
             time.sleep(1)
@@ -346,10 +341,7 @@ elif menu=="🤖 Classify Waste":
             )
 
 
-
-        index=np.argmax(
-            prediction[0]
-        )
+        index=np.argmax(prediction[0])
 
 
         result=classes[index]
@@ -362,7 +354,6 @@ elif menu=="🤖 Classify Waste":
 
 
         st.markdown(
-
         f"""
 
         <div class='card'>
@@ -376,9 +367,7 @@ elif menu=="🤖 Classify Waste":
         </div>
 
         """,
-
         unsafe_allow_html=True
-
         )
 
 
@@ -393,148 +382,72 @@ elif menu=="🤖 Classify Waste":
 
 
 
-        with st.expander(
-            "AI Confidence Details"
-        ):
-
-            for i,v in enumerate(prediction[0]):
-
-                st.write(
-                    classes[i],
-                    round(v*100,2),
-                    "%"
-                )
-
-
-        report=f"""
-
-SMART WASTE REPORT
-
-Waste:
-{result}
-
-Confidence:
-{confidence:.2f}%
-
-Suggestion:
-{tips[result]}
-
-"""
-
-
-        st.download_button(
-
-            "📥 Download Report",
-
-            report,
-
-            "waste_report.txt"
-
-        )
-
-
-
-
 # ==============================
-# DASHBOARD PAGE
+# DASHBOARD
 # ==============================
-
 
 elif menu=="📊 Dashboard":
 
 
-    st.title(
-        "📊 Waste Dashboard"
-    )
+    st.title("📊 Dashboard")
 
 
-    a,b,c=st.columns(3)
-
-
-    a.metric(
-        "Images Tested",
-        "100+"
-    )
-
-    b.metric(
+    st.metric(
         "AI Accuracy",
         "95%"
     )
 
-    c.metric(
-        "Waste Types",
+
+    st.metric(
+        "Waste Categories",
         "6"
     )
 
 
-    st.progress(
-        95
-    )
-
-
     st.success(
-        "Model Running Successfully 🚀"
+        "AI System Running Successfully 🚀"
     )
 
 
 
-
 # ==============================
-# RECYCLING PAGE
+# GUIDE
 # ==============================
-
 
 elif menu=="🌱 Recycling Guide":
 
 
-    st.title(
-        "🌱 Recycling Guide"
-    )
+    st.title("🌱 Recycling Guide")
 
 
     st.info(
     """
 
-    📦 Cardboard:
-    Flatten before recycling
+    📦 Cardboard : Flatten before recycle
 
+    🍾 Glass : Clean before recycle
 
-    🍾 Glass:
-    Clean before recycling
+    🔩 Metal : Separate metals
 
+    📄 Paper : Keep dry
 
-    🔩 Metal:
-    Separate from other waste
+    🥤 Plastic : Reduce usage
 
-
-    📄 Paper:
-    Keep dry
-
-
-    🥤 Plastic:
-    Reduce usage
-
-
-    🗑 Trash:
-    Dispose responsibly
+    🗑 Trash : Dispose responsibly
 
     """
     )
 
 
 
-
 # ==============================
-# ABOUT PAGE
+# ABOUT
 # ==============================
-
 
 elif menu=="ℹ️ About":
 
 
-    st.title(
-        "ℹ️ About Project"
-    )
+    st.title("ℹ️ About Project")
 
 
     st.write(
@@ -548,7 +461,7 @@ elif menu=="ℹ️ About":
     ✔ Python  
     ✔ TensorFlow  
     ✔ MobileNetV2  
-    ✔ Streamlit  
+    ✔ Streamlit
 
     """
     )
@@ -559,15 +472,40 @@ elif menu=="ℹ️ About":
 
     👨‍💻 Developed By
 
-    Adnan Amin Mir  
+    **Adnan Amin Mir**
 
-    Obaid Rashid  
+    **Obaid Rashid**
 
-    Nafeesa Jan
+    **Nafeesa Jan**
 
     """
     )
 
+
+    st.info(
+    """
+
+    📞 Customer Support
+
+
+    Phone:
+    +91 7889838588
+
+
+    Email:
+    miradnan227@gmail.com
+
+
+    Available:
+
+    Monday - Saturday
+
+    Time:
+
+    10:00 AM - 6:00 PM
+
+    """
+    )
 
 
 
@@ -581,17 +519,11 @@ st.write("---")
 
 st.markdown(
 """
-
 <div class='footer'>
 
-<h4>
-
-♻️ Smart Waste AI System
-
-</h4>
+<h4>♻️ Smart Waste AI System</h4>
 
 </div>
-
 """,
 unsafe_allow_html=True
 )
